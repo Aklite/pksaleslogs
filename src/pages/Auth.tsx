@@ -36,7 +36,7 @@ export default function Auth() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-display font-bold text-foreground">
-            Saree <span className="text-gold">Ledger</span>
+            Prabakaran <span className="text-gold">App</span>
           </h1>
           <p className="text-sm text-muted-foreground mt-1">Your Premium Sales Companion</p>
         </div>
