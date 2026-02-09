@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { format } from "date-fns";
+import SaleForm from "@/components/SaleForm";
+import WhatsAppThankYou from "@/components/WhatsAppThankYou";
 
 interface Sale {
   id: string;
@@ -18,12 +17,17 @@ interface Sale {
   tips: number;
   total: number;
   sale_date: string;
+  saree_type: string | null;
+  payment_mode: string;
+  commission: number;
   customer_name?: string;
+  customer_phone?: string;
 }
 
 interface CustomerOption {
   id: string;
   name: string;
+  phone: string;
 }
 
 export default function SalesLog() {
@@ -32,7 +36,7 @@ export default function SalesLog() {
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Sale | null>(null);
-  const [form, setForm] = useState({ customer_id: "", saree_price: "", quantity: "1", tips: "0" });
+  const [whatsApp, setWhatsApp] = useState<{ name: string; phone: string } | null>(null);
 
   const fetchData = async () => {
     if (!user) return;
@@ -46,41 +50,43 @@ export default function SalesLog() {
 
     const { data: custData } = await supabase
       .from("customers")
-      .select("id, name")
+      .select("id, name, phone")
       .eq("user_id", user.id)
       .order("name");
 
     setCustomers((custData as CustomerOption[]) || []);
 
-    const custMap = new Map((custData || []).map((c: any) => [c.id, c.name]));
+    const custMap = new Map((custData || []).map((c: any) => [c.id, c]));
     setSales(
-      (salesData || []).map((s: any) => ({
-        ...s,
-        customer_name: s.customer_id ? custMap.get(s.customer_id) || "Unknown" : "Walk-in",
-      }))
+      (salesData || []).map((s: any) => {
+        const cust = s.customer_id ? custMap.get(s.customer_id) : null;
+        return {
+          ...s,
+          customer_name: cust ? cust.name : "Walk-in",
+          customer_phone: cust?.phone || "",
+        };
+      })
     );
   };
 
-  useEffect(() => { fetchData(); }, [user]);
-
-  const openNew = () => {
-    setEditing(null);
-    setForm({ customer_id: "", saree_price: "", quantity: "1", tips: "0" });
-    setDialogOpen(true);
-  };
+  useEffect(() => {
+    fetchData();
+  }, [user]);
 
   const openEdit = (s: Sale) => {
     setEditing(s);
-    setForm({
-      customer_id: s.customer_id || "",
-      saree_price: String(s.saree_price),
-      quantity: String(s.quantity),
-      tips: String(s.tips),
-    });
     setDialogOpen(true);
   };
 
-  const handleSave = async () => {
+  const handleSave = async (form: {
+    customer_id: string;
+    saree_price: string;
+    quantity: string;
+    tips: string;
+    saree_type: string;
+    payment_mode: string;
+    commission: string;
+  }) => {
     const price = parseFloat(form.saree_price);
     const qty = parseInt(form.quantity);
     if (!price || price <= 0) return toast.error("Enter a valid price");
@@ -92,6 +98,9 @@ export default function SalesLog() {
       quantity: qty,
       tips: parseFloat(form.tips) || 0,
       customer_id: form.customer_id || null,
+      saree_type: form.saree_type || null,
+      payment_mode: form.payment_mode.toLowerCase(),
+      commission: parseFloat(form.commission) || 0,
       user_id: user.id,
     };
 
@@ -103,9 +112,21 @@ export default function SalesLog() {
     } else {
       const { error } = await supabase.from("sales").insert(payload);
       if (error) return toast.error(error.message);
-      toast.success("Sale recorded! 🎉");
+
+      // Show WhatsApp thank-you if customer has phone
+      if (form.customer_id) {
+        const cust = customers.find((c) => c.id === form.customer_id);
+        if (cust?.phone) {
+          setWhatsApp({ name: cust.name, phone: cust.phone });
+        } else {
+          toast.success("Sale recorded! 🎉");
+        }
+      } else {
+        toast.success("Sale recorded! 🎉");
+      }
     }
     setDialogOpen(false);
+    setEditing(null);
     fetchData();
   };
 
@@ -116,13 +137,28 @@ export default function SalesLog() {
     fetchData();
   };
 
+  const getEditInitialValues = (s: Sale) => ({
+    customer_id: s.customer_id || "",
+    saree_price: String(s.saree_price),
+    quantity: String(s.quantity),
+    tips: String(s.tips),
+    saree_type: s.saree_type || "",
+    payment_mode: s.payment_mode ? s.payment_mode.charAt(0).toUpperCase() + s.payment_mode.slice(1) : "Cash",
+    commission: String(s.commission || ""),
+  });
+
+  const paymentBadgeClass = (mode: string) => {
+    switch (mode) {
+      case "upi": return "bg-[hsl(260,60%,92%)] text-[hsl(260,50%,40%)]";
+      case "card": return "bg-[hsl(210,60%,92%)] text-[hsl(210,50%,35%)]";
+      default: return "bg-[hsl(142,40%,90%)] text-[hsl(142,50%,30%)]";
+    }
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-display font-bold">Sales Log</h1>
-        <Button onClick={openNew} size="sm" className="gradient-gold text-emerald-dark border-0 gap-1 font-semibold">
-          <Plus className="h-4 w-4" /> New Sale
-        </Button>
       </div>
 
       <AnimatePresence>
@@ -136,15 +172,30 @@ export default function SalesLog() {
             className="bg-card rounded-xl border border-border p-4 shadow-luxury"
           >
             <div className="flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-sm">{s.customer_name}</p>
+              <div className="min-w-0">
+                <p className="font-semibold text-sm truncate">{s.customer_name}</p>
                 <p className="text-xs text-muted-foreground">{format(new Date(s.sale_date), "dd MMM yyyy")}</p>
+                <div className="flex items-center gap-1.5 mt-1">
+                  {s.saree_type && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold gradient-gold text-emerald-dark">
+                      {s.saree_type}
+                    </span>
+                  )}
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${paymentBadgeClass(s.payment_mode)}`}>
+                    {s.payment_mode?.toUpperCase() || "CASH"}
+                  </span>
+                </div>
               </div>
-              <div className="text-right">
+              <div className="text-right shrink-0">
                 <p className="font-display font-bold">₹{Number(s.total).toLocaleString("en-IN")}</p>
                 <p className="text-[10px] text-muted-foreground">
-                  {s.quantity}x ₹{Number(s.saree_price).toLocaleString("en-IN")} + ₹{Number(s.tips).toLocaleString("en-IN")} tip
+                  {s.quantity}x ₹{Number(s.saree_price).toLocaleString("en-IN")}
                 </p>
+                {s.commission > 0 && (
+                  <p className="text-[10px] text-gold-dark font-medium">
+                    Commission: ₹{Number(s.commission).toLocaleString("en-IN")}
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex justify-end gap-1 mt-2">
@@ -160,58 +211,48 @@ export default function SalesLog() {
       </AnimatePresence>
 
       {sales.length === 0 && (
-        <p className="text-center text-sm text-muted-foreground py-12">No sales recorded yet. Tap "New Sale" to begin.</p>
+        <p className="text-center text-sm text-muted-foreground py-12">No sales recorded yet. Tap the + button to begin.</p>
       )}
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-sm">
+      {/* Floating Action Button */}
+      <button
+        onClick={() => {
+          setEditing(null);
+          setDialogOpen(true);
+        }}
+        className="fixed bottom-24 right-5 z-40 h-14 w-14 rounded-full gradient-gold shadow-gold flex items-center justify-center text-emerald-dark active:scale-95 transition-transform"
+        aria-label="New Sale"
+      >
+        <Plus className="h-7 w-7" strokeWidth={2.5} />
+      </button>
+
+      {/* Sale Form Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditing(null); }}>
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display">{editing ? "Edit Sale" : "New Sale"}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <Select value={form.customer_id} onValueChange={(v) => setForm({ ...form, customer_id: v })}>
-              <SelectTrigger className="h-11">
-                <SelectValue placeholder="Select customer (optional)" />
-              </SelectTrigger>
-              <SelectContent>
-                {customers.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="number"
-              placeholder="Saree Price (₹) *"
-              value={form.saree_price}
-              onChange={(e) => setForm({ ...form, saree_price: e.target.value })}
-              className="h-11"
-            />
-            <Input
-              type="number"
-              placeholder="Quantity"
-              value={form.quantity}
-              onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-              className="h-11"
-            />
-            <Input
-              type="number"
-              placeholder="Tips / Commission (₹)"
-              value={form.tips}
-              onChange={(e) => setForm({ ...form, tips: e.target.value })}
-              className="h-11"
-            />
-            <div className="bg-muted rounded-lg p-3 text-center">
-              <p className="text-xs text-muted-foreground">Total</p>
-              <p className="text-xl font-display font-bold">
-                ₹{((parseFloat(form.saree_price) || 0) * (parseInt(form.quantity) || 1) + (parseFloat(form.tips) || 0)).toLocaleString("en-IN")}
-              </p>
-            </div>
-            <Button onClick={handleSave} className="w-full h-11 gradient-emerald text-primary-foreground border-0">
-              {editing ? "Update Sale" : "Record Sale"}
-            </Button>
-          </div>
+          <SaleForm
+            customers={customers}
+            editing={!!editing}
+            initialValues={editing ? getEditInitialValues(editing) : undefined}
+            onSave={handleSave}
+          />
         </DialogContent>
       </Dialog>
+
+      {/* WhatsApp Thank You */}
+      {whatsApp && (
+        <WhatsAppThankYou
+          open={!!whatsApp}
+          onClose={() => {
+            setWhatsApp(null);
+            toast.success("Sale recorded! 🎉");
+          }}
+          customerName={whatsApp.name}
+          customerPhone={whatsApp.phone}
+        />
+      )}
     </div>
   );
 }
