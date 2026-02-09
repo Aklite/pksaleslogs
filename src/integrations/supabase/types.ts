@@ -49,36 +49,45 @@ export type Database = {
       }
       sales: {
         Row: {
+          commission: number
           created_at: string
           customer_id: string | null
           id: string
+          payment_mode: string
           quantity: number
           sale_date: string
           saree_price: number
+          saree_type: string | null
           tips: number
           total: number | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          commission?: number
           created_at?: string
           customer_id?: string | null
           id?: string
+          payment_mode?: string
           quantity?: number
           sale_date?: string
           saree_price?: number
+          saree_type?: string | null
           tips?: number
           total?: number | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          commission?: number
           created_at?: string
           customer_id?: string | null
           id?: string
+          payment_mode?: string
           quantity?: number
           sale_date?: string
           saree_price?: number
+          saree_type?: string | null
           tips?: number
           total?: number | null
           updated_at?: string
