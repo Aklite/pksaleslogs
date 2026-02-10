@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 150 20% 97%;
+    --background: 160 30% 96%;
     --foreground: 160 80% 8%;
 
     --card: 0 0% 100%;
@@ -54,28 +54,37 @@
     --emerald-dark: 160 80% 8%;
     --success: 142 71% 45%;
     --whatsapp: 142 70% 40%;
+
+    /* Glass tokens */
+    --glass-bg: 0 0% 100% / 0.6;
+    --glass-border: 0 0% 100% / 0.3;
+    --glass-glow: 45 56% 52% / 0.15;
   }
 
   .dark {
-    --background: 160 80% 4%;
-    --foreground: 45 60% 90%;
-    --card: 160 60% 8%;
-    --card-foreground: 45 60% 90%;
-    --popover: 160 60% 8%;
-    --popover-foreground: 45 60% 90%;
+    --background: 160 40% 4%;
+    --foreground: 45 20% 88%;
+    --card: 160 30% 8%;
+    --card-foreground: 45 20% 88%;
+    --popover: 160 30% 8%;
+    --popover-foreground: 45 20% 88%;
     --primary: 45 56% 52%;
     --primary-foreground: 160 80% 8%;
     --secondary: 160 60% 16%;
     --secondary-foreground: 45 60% 90%;
-    --muted: 160 40% 12%;
+    --muted: 160 30% 12%;
     --muted-foreground: 150 10% 55%;
     --accent: 45 56% 52%;
     --accent-foreground: 160 80% 8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 100%;
-    --border: 160 40% 16%;
-    --input: 160 40% 16%;
+    --border: 160 30% 16%;
+    --input: 160 30% 16%;
     --ring: 45 56% 52%;
+
+    --glass-bg: 160 40% 8% / 0.5;
+    --glass-border: 45 56% 52% / 0.12;
+    --glass-glow: 45 56% 52% / 0.08;
   }
 }
 
@@ -118,5 +127,31 @@
   }
   .shadow-gold {
     box-shadow: 0 4px 20px -4px hsl(45 56% 52% / 0.3);
+  }
+
+  /* Glassmorphism utilities */
+  .glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+  .glass-strong {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border));
+    box-shadow: 0 8px 32px hsl(var(--glass-glow)), inset 0 1px 0 hsl(0 0% 100% / 0.08);
+  }
+  .glass-glow {
+    box-shadow: 0 0 20px hsl(var(--glass-glow)), 0 4px 24px -4px hsl(160 80% 12% / 0.1);
+  }
+  .glow-border-gold {
+    border: 1px solid hsl(45 56% 52% / 0.25);
+    box-shadow: 0 0 12px hsl(45 56% 52% / 0.1), inset 0 1px 0 hsl(45 56% 52% / 0.05);
+  }
+  .glow-border-emerald {
+    border: 1px solid hsl(160 80% 12% / 0.3);
+    box-shadow: 0 0 12px hsl(160 60% 20% / 0.1);
   }
 }

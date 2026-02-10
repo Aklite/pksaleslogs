@@ -40,7 +40,6 @@ export default function Dashboard() {
     monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
     const weekStart = monday.toISOString().split("T")[0];
 
-    // Fetch today's sales with customer info
     const { data: todayData } = await supabase
       .from("sales")
       .select("id, total, quantity, customer_id")
@@ -52,7 +51,6 @@ export default function Dashboard() {
     setTodaySales(todayTotalVal);
     setTodaySareeCount(todayQty);
 
-    // Get customer names for today's bills
     const custIds = [...new Set((todayData || []).filter((s) => s.customer_id).map((s) => s.customer_id!))];
     let custMap = new Map<string, string>();
     if (custIds.length > 0) {
@@ -71,7 +69,6 @@ export default function Dashboard() {
       }))
     );
 
-    // Monthly total + tips + commission
     const { data: monthData } = await supabase
       .from("sales")
       .select("total, tips, commission")
@@ -81,7 +78,6 @@ export default function Dashboard() {
     setTipsEarned(monthData?.reduce((s, r) => s + Number(r.tips), 0) || 0);
     setMonthlyCommission(monthData?.reduce((s, r) => s + Number((r as any).commission || 0), 0) || 0);
 
-    // Weekly data
     const { data: weekData } = await supabase
       .from("sales")
       .select("sale_date, total")
@@ -147,14 +143,14 @@ export default function Dashboard() {
       </div>
 
       {/* Today's Bills */}
-      <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
+      <div className="glass-strong rounded-xl p-4 glow-border-gold glass-glow">
         <h3 className="text-sm font-semibold mb-3">Today's Bills</h3>
         {todayBills.length === 0 ? (
           <p className="text-xs text-muted-foreground text-center py-4">No sales today yet</p>
         ) : (
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {todayBills.map((bill) => (
-              <div key={bill.id} className="flex items-center justify-between py-1.5 border-b border-border last:border-0">
+              <div key={bill.id} className="flex items-center justify-between py-1.5" style={{ borderBottom: "1px solid hsl(var(--glass-border))" }}>
                 <div className="min-w-0">
                   <p className="text-sm font-medium truncate">{bill.customer_name}</p>
                   <p className="text-[10px] text-muted-foreground">{bill.quantity} saree{bill.quantity > 1 ? "s" : ""}</p>
@@ -175,7 +171,7 @@ export default function Dashboard() {
       </div>
 
       {/* Weekly Chart */}
-      <div className="bg-card rounded-xl border border-border p-4 shadow-luxury">
+      <div className="glass-strong rounded-xl p-4 glow-border-gold glass-glow">
         <h3 className="text-sm font-semibold mb-3">Weekly Performance</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={weeklyData}>
@@ -197,7 +193,7 @@ export default function Dashboard() {
       </div>
 
       {/* Progress Ring */}
-      <div className="bg-card rounded-xl border border-border p-4 shadow-luxury flex items-center justify-between">
+      <div className="glass-strong rounded-xl p-4 glow-border-gold glass-glow flex items-center justify-between">
         <div>
           <h3 className="text-sm font-semibold">Monthly Goal</h3>
           <p className="text-xs text-muted-foreground">₹10,00,000 target</p>
@@ -214,7 +210,7 @@ function LogoutButton() {
   return (
     <button
       onClick={signOut}
-      className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md border border-border"
+      className="text-xs text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-md glass glow-border-gold"
     >
       Sign out
     </button>

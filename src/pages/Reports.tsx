@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, FileSpreadsheet } from "lucide-react";
+import { Download, FileSpreadsheet, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,6 +12,7 @@ export default function Reports() {
   const { user } = useAuth();
   const [month, setMonth] = useState(format(new Date(), "yyyy-MM"));
   const [loading, setLoading] = useState(false);
+  const [loadingDir, setLoadingDir] = useState(false);
 
   const months = Array.from({ length: 12 }, (_, i) => {
     const d = new Date(new Date().getFullYear(), i, 1);
@@ -58,7 +59,6 @@ export default function Reports() {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sales Ledger");
 
-    // Auto-width columns
     const colWidths = Object.keys(rows[0]).map((key) => ({
       wch: Math.max(key.length, ...rows.map((r: any) => String(r[key]).length)) + 2,
     }));
@@ -69,13 +69,79 @@ export default function Reports() {
     setLoading(false);
   };
 
+  const exportCustomerDirectory = async () => {
+    if (!user) return;
+    setLoadingDir(true);
+
+    const { data: customers } = await supabase
+      .from("customers")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("name");
+
+    const { data: salesData } = await supabase
+      .from("sales")
+      .select("customer_id, total")
+      .eq("user_id", user.id);
+
+    // Aggregate sales by customer
+    const salesMap = new Map<string, number>();
+    (salesData || []).forEach((s: any) => {
+      if (!s.customer_id) return;
+      salesMap.set(s.customer_id, (salesMap.get(s.customer_id) || 0) + Number(s.total || 0));
+    });
+
+    // City summary
+    const cityMap = new Map<string, number>();
+    (customers || []).forEach((c: any) => {
+      const city = (c.address || "Unknown").trim() || "Unknown";
+      const spent = salesMap.get(c.id) || 0;
+      cityMap.set(city, (cityMap.get(city) || 0) + spent);
+    });
+
+    const rows = (customers || []).map((c: any) => ({
+      Name: c.name,
+      Phone: c.phone,
+      "Address / City": c.address || "",
+      Category: c.buyer_speed || "Not Set",
+      Preferences: (c.preferences || []).join(", "),
+      "Total Purchases (₹)": salesMap.get(c.id) || 0,
+    }));
+
+    if (rows.length === 0) {
+      setLoadingDir(false);
+      return toast.error("No customers to export");
+    }
+
+    const ws = XLSX.utils.json_to_sheet(rows);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Customer Directory");
+
+    // City Summary sheet
+    const cityRows = Array.from(cityMap.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([city, total]) => ({ City: city, "Total Sales (₹)": total }));
+    const ws2 = XLSX.utils.json_to_sheet(cityRows);
+    XLSX.utils.book_append_sheet(wb, ws2, "City Summary");
+
+    const colWidths = Object.keys(rows[0]).map((key) => ({
+      wch: Math.max(key.length, ...rows.map((r: any) => String(r[key]).length)) + 2,
+    }));
+    ws["!cols"] = colWidths;
+
+    XLSX.writeFile(wb, `Customer_Directory_${format(new Date(), "yyyy-MM-dd")}.xlsx`);
+    toast.success("Customer directory downloaded! 📇");
+    setLoadingDir(false);
+  };
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-display font-bold">Reports</h1>
 
-      <div className="bg-card rounded-xl border border-border p-6 shadow-luxury space-y-5">
+      {/* Monthly Ledger Export */}
+      <div className="glass-strong rounded-xl p-6 glow-border-gold glass-glow space-y-5">
         <div className="flex items-center gap-3">
-          <FileSpreadsheet className="h-8 w-8 text-secondary" />
+          <FileSpreadsheet className="h-8 w-8" style={{ color: "hsl(45 56% 52%)" }} />
           <div>
             <h3 className="font-semibold">Monthly Ledger Export</h3>
             <p className="text-xs text-muted-foreground">Download your sales data as Excel</p>
@@ -99,7 +165,27 @@ export default function Reports() {
           className="w-full h-12 gradient-gold text-emerald-dark border-0 font-semibold text-base gap-2"
         >
           <Download className="h-5 w-5" />
-          {loading ? "Generating..." : "Export Monthly Ledger to Excel"}
+          {loading ? "Generating..." : "Export Monthly Ledger"}
+        </Button>
+      </div>
+
+      {/* Customer Directory Export */}
+      <div className="glass-strong rounded-xl p-6 glow-border-emerald glass-glow space-y-5">
+        <div className="flex items-center gap-3">
+          <Users className="h-8 w-8" style={{ color: "hsl(160 60% 20%)" }} />
+          <div>
+            <h3 className="font-semibold">Customer Directory Export</h3>
+            <p className="text-xs text-muted-foreground">Name, Phone, City, Category, Preferences & Total Purchases + City Summary</p>
+          </div>
+        </div>
+
+        <Button
+          onClick={exportCustomerDirectory}
+          disabled={loadingDir}
+          className="w-full h-12 gradient-emerald text-primary-foreground border-0 font-semibold text-base gap-2"
+        >
+          <Download className="h-5 w-5" />
+          {loadingDir ? "Generating..." : "Export Customer Directory"}
         </Button>
       </div>
     </div>
