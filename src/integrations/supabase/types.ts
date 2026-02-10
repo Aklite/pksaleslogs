@@ -14,33 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_photos: {
+        Row: {
+          created_at: string
+          customer_id: string
+          description: string | null
+          id: string
+          photo_url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          description?: string | null
+          id?: string
+          photo_url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          description?: string | null
+          id?: string
+          photo_url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_photos_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers: {
         Row: {
           address: string | null
+          buyer_speed: string | null
           created_at: string
           id: string
           name: string
           phone: string
+          preferences: string[] | null
           style_notes: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           address?: string | null
+          buyer_speed?: string | null
           created_at?: string
           id?: string
           name: string
           phone: string
+          preferences?: string[] | null
           style_notes?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           address?: string | null
+          buyer_speed?: string | null
           created_at?: string
           id?: string
           name?: string
           phone?: string
+          preferences?: string[] | null
           style_notes?: string | null
           updated_at?: string
           user_id?: string

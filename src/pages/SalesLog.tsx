@@ -113,7 +113,6 @@ export default function SalesLog() {
       const { error } = await supabase.from("sales").insert(payload);
       if (error) return toast.error(error.message);
 
-      // Show WhatsApp thank-you if customer has phone
       if (form.customer_id) {
         const cust = customers.find((c) => c.id === form.customer_id);
         if (cust?.phone) {
@@ -147,11 +146,11 @@ export default function SalesLog() {
     commission: String(s.commission || ""),
   });
 
-  const paymentBadgeClass = (mode: string) => {
+  const paymentBadgeStyle = (mode: string) => {
     switch (mode) {
-      case "upi": return "bg-[hsl(260,60%,92%)] text-[hsl(260,50%,40%)]";
-      case "card": return "bg-[hsl(210,60%,92%)] text-[hsl(210,50%,35%)]";
-      default: return "bg-[hsl(142,40%,90%)] text-[hsl(142,50%,30%)]";
+      case "upi": return { background: "hsl(260 60% 92% / 0.6)", color: "hsl(260 50% 40%)" };
+      case "card": return { background: "hsl(210 60% 92% / 0.6)", color: "hsl(210 50% 35%)" };
+      default: return { background: "hsl(142 40% 90% / 0.6)", color: "hsl(142 50% 30%)" };
     }
   };
 
@@ -169,7 +168,7 @@ export default function SalesLog() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, x: -100 }}
-            className="bg-card rounded-xl border border-border p-4 shadow-luxury"
+            className="glass-strong rounded-xl p-4 glow-border-gold glass-glow"
           >
             <div className="flex items-center justify-between">
               <div className="min-w-0">
@@ -181,7 +180,7 @@ export default function SalesLog() {
                       {s.saree_type}
                     </span>
                   )}
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${paymentBadgeClass(s.payment_mode)}`}>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold" style={paymentBadgeStyle(s.payment_mode)}>
                     {s.payment_mode?.toUpperCase() || "CASH"}
                   </span>
                 </div>
@@ -192,7 +191,7 @@ export default function SalesLog() {
                   {s.quantity}x ₹{Number(s.saree_price).toLocaleString("en-IN")}
                 </p>
                 {s.commission > 0 && (
-                  <p className="text-[10px] text-gold-dark font-medium">
+                  <p className="text-[10px] font-medium" style={{ color: "hsl(45 56% 40%)" }}>
                     Commission: ₹{Number(s.commission).toLocaleString("en-IN")}
                   </p>
                 )}
@@ -228,7 +227,7 @@ export default function SalesLog() {
 
       {/* Sale Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditing(null); }}>
-        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto glass-strong glow-border-gold">
           <DialogHeader>
             <DialogTitle className="font-display">{editing ? "Edit Sale" : "New Sale"}</DialogTitle>
           </DialogHeader>

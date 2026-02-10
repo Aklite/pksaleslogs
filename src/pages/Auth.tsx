@@ -32,34 +32,34 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "linear-gradient(145deg, hsl(160 40% 4%), hsl(160 60% 8%), hsl(160 40% 4%))" }}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold text-foreground">
-            Prabakaran <span className="text-gold">App</span>
+          <h1 className="text-3xl font-display font-bold" style={{ color: "hsl(45 20% 88%)" }}>
+            Prabakaran <span style={{ color: "hsl(45 56% 52%)" }}>App</span>
           </h1>
-          <p className="text-sm text-muted-foreground mt-1">Your Premium Sales Companion</p>
+          <p className="text-sm mt-1" style={{ color: "hsl(150 10% 55%)" }}>Your Premium Sales Companion</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 glass-strong rounded-2xl p-6 glow-border-gold">
           <Input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-12"
+            className="h-12 bg-transparent border-0 glass glow-border-gold"
           />
           <Input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-12"
+            className="h-12 bg-transparent border-0 glass glow-border-gold"
           />
           <Button
             type="submit"
             disabled={loading}
-            className="w-full h-12 gradient-emerald text-primary-foreground font-semibold text-base border-0 hover:opacity-90"
+            className="w-full h-12 gradient-gold font-semibold text-base border-0 hover:opacity-90 text-emerald-dark"
           >
             {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
           </Button>
@@ -67,7 +67,8 @@ export default function Auth() {
 
         <button
           onClick={() => setIsLogin(!isLogin)}
-          className="w-full text-center text-sm text-muted-foreground mt-4 hover:text-foreground transition-colors"
+          className="w-full text-center text-sm mt-4 transition-colors"
+          style={{ color: "hsl(150 10% 55%)" }}
         >
           {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
         </button>
