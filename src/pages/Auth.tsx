@@ -36,7 +36,7 @@ export default function Auth() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-display font-bold" style={{ color: "hsl(45 20% 88%)" }}>
-            Prabakaran <span style={{ color: "hsl(45 56% 52%)" }}>App</span>
+            Sales<span style={{ color: "hsl(45 56% 52%)" }}>Logs</span>
           </h1>
           <p className="text-sm mt-1" style={{ color: "hsl(150 10% 55%)" }}>Your Premium Sales Companion</p>
         </div>
