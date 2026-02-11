@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { motion } from "framer-motion";
 
 interface BentoCardProps {
   title: string;
@@ -13,23 +12,23 @@ export default function BentoCard({ title, value, icon, variant = "default" }: B
   const isGold = variant === "gold";
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
+    <div
       className={`rounded-xl p-4 ${
         isEmerald
-          ? "gradient-emerald text-primary-foreground"
+          ? "gradient-emerald"
           : isGold
-          ? "gradient-gold text-emerald-dark"
-          : "glass-strong glow-border-gold glass-glow"
+          ? "gradient-gold"
+          : "glass-strong glow-border-gold"
       }`}
+      style={{
+        color: isEmerald || isGold ? "hsl(0 0% 7%)" : "hsl(0 0% 93%)",
+      }}
     >
       <div className="flex items-center gap-2 mb-1 opacity-80 text-xs font-medium uppercase tracking-wider">
         {icon}
         {title}
       </div>
       <div className="text-2xl font-display font-bold">{value}</div>
-    </motion.div>
+    </div>
   );
 }
