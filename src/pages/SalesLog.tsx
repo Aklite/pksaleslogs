@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { format } from "date-fns";
 import SaleForm from "@/components/SaleForm";
 import WhatsAppThankYou from "@/components/WhatsAppThankYou";
@@ -30,9 +30,31 @@ interface CustomerOption {
   phone: string;
 }
 
+function SalesListSkeleton() {
+  return (
+    <div className="space-y-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="glass-strong rounded-xl p-4 glow-border-gold space-y-2">
+          <div className="flex justify-between">
+            <div className="space-y-1.5">
+              <div className="skeleton h-4 w-28" />
+              <div className="skeleton h-3 w-20" />
+            </div>
+            <div className="space-y-1.5 text-right">
+              <div className="skeleton h-5 w-24 ml-auto" />
+              <div className="skeleton h-3 w-16 ml-auto" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export default function SalesLog() {
   const { user } = useAuth();
   const [sales, setSales] = useState<Sale[]>([]);
+  const [loading, setLoading] = useState(true);
   const [customers, setCustomers] = useState<CustomerOption[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Sale | null>(null);
@@ -40,6 +62,7 @@ export default function SalesLog() {
 
   const fetchData = async () => {
     if (!user) return;
+    setLoading(true);
     const { data: salesData } = await supabase
       .from("sales")
       .select("*")
@@ -67,6 +90,7 @@ export default function SalesLog() {
         };
       })
     );
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -148,69 +172,74 @@ export default function SalesLog() {
 
   const paymentBadgeStyle = (mode: string) => {
     switch (mode) {
-      case "upi": return { background: "hsl(260 60% 92% / 0.6)", color: "hsl(260 50% 40%)" };
-      case "card": return { background: "hsl(210 60% 92% / 0.6)", color: "hsl(210 50% 35%)" };
-      default: return { background: "hsl(142 40% 90% / 0.6)", color: "hsl(142 50% 30%)" };
+      case "upi": return { background: "hsl(260 60% 50% / 0.12)", color: "hsl(260 50% 65%)" };
+      case "card": return { background: "hsl(210 60% 50% / 0.12)", color: "hsl(210 50% 65%)" };
+      default: return { background: "hsl(142 40% 40% / 0.12)", color: "hsl(142 50% 55%)" };
     }
   };
 
   return (
     <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold">Sales Log</h1>
+        <h1 className="text-2xl font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>Sales Log</h1>
       </div>
 
-      <AnimatePresence>
-        {sales.map((s) => (
-          <motion.div
-            key={s.id}
-            layout
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, x: -100 }}
-            className="glass-strong rounded-xl p-4 glow-border-gold glass-glow"
-          >
-            <div className="flex items-center justify-between">
-              <div className="min-w-0">
-                <p className="font-semibold text-sm truncate">{s.customer_name}</p>
-                <p className="text-xs text-muted-foreground">{format(new Date(s.sale_date), "dd MMM yyyy")}</p>
-                <div className="flex items-center gap-1.5 mt-1">
-                  {s.saree_type && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold gradient-gold text-emerald-dark">
-                      {s.saree_type}
+      {loading ? (
+        <SalesListSkeleton />
+      ) : (
+        <AnimatePresence>
+          {sales.map((s) => (
+            <motion.div
+              key={s.id}
+              layout
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, x: -80 }}
+              transition={{ duration: 0.2 }}
+              className="glass-strong rounded-xl p-4 glow-border-gold mb-3"
+            >
+              <div className="flex items-center justify-between">
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm truncate" style={{ color: "hsl(0 0% 90%)" }}>{s.customer_name}</p>
+                  <p className="text-xs" style={{ color: "hsl(0 0% 50%)" }}>{format(new Date(s.sale_date), "dd MMM yyyy")}</p>
+                  <div className="flex items-center gap-1.5 mt-1">
+                    {s.saree_type && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold gradient-gold" style={{ color: "hsl(0 0% 7%)" }}>
+                        {s.saree_type}
+                      </span>
+                    )}
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold" style={paymentBadgeStyle(s.payment_mode)}>
+                      {s.payment_mode?.toUpperCase() || "CASH"}
                     </span>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>₹{Number(s.total).toLocaleString("en-IN")}</p>
+                  <p className="text-[10px]" style={{ color: "hsl(0 0% 50%)" }}>
+                    {s.quantity}x ₹{Number(s.saree_price).toLocaleString("en-IN")}
+                  </p>
+                  {s.commission > 0 && (
+                    <p className="text-[10px] font-medium" style={{ color: "hsl(43 74% 38%)" }}>
+                      Commission: ₹{Number(s.commission).toLocaleString("en-IN")}
+                    </p>
                   )}
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold" style={paymentBadgeStyle(s.payment_mode)}>
-                    {s.payment_mode?.toUpperCase() || "CASH"}
-                  </span>
                 </div>
               </div>
-              <div className="text-right shrink-0">
-                <p className="font-display font-bold">₹{Number(s.total).toLocaleString("en-IN")}</p>
-                <p className="text-[10px] text-muted-foreground">
-                  {s.quantity}x ₹{Number(s.saree_price).toLocaleString("en-IN")}
-                </p>
-                {s.commission > 0 && (
-                  <p className="text-[10px] font-medium" style={{ color: "hsl(45 56% 40%)" }}>
-                    Commission: ₹{Number(s.commission).toLocaleString("en-IN")}
-                  </p>
-                )}
+              <div className="flex justify-end gap-1 mt-2">
+                <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
+                  <Pencil className="h-3.5 w-3.5" style={{ color: "hsl(0 0% 50%)" }} />
+                </button>
+                <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors">
+                  <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                </button>
               </div>
-            </div>
-            <div className="flex justify-end gap-1 mt-2">
-              <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
-              </button>
-              <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors">
-                <Trash2 className="h-3.5 w-3.5 text-destructive" />
-              </button>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      )}
 
-      {sales.length === 0 && (
-        <p className="text-center text-sm text-muted-foreground py-12">No sales recorded yet. Tap the + button to begin.</p>
+      {!loading && sales.length === 0 && (
+        <p className="text-center text-sm py-12" style={{ color: "hsl(0 0% 45%)" }}>No sales recorded yet. Tap the + button to begin.</p>
       )}
 
       {/* Floating Action Button */}
@@ -219,7 +248,8 @@ export default function SalesLog() {
           setEditing(null);
           setDialogOpen(true);
         }}
-        className="fixed bottom-24 right-5 z-40 h-14 w-14 rounded-full gradient-gold shadow-gold flex items-center justify-center text-emerald-dark active:scale-95 transition-transform"
+        className="fixed bottom-24 right-5 z-40 h-14 w-14 rounded-full gradient-gold shadow-gold flex items-center justify-center active:scale-95 transition-transform"
+        style={{ color: "hsl(0 0% 7%)" }}
         aria-label="New Sale"
       >
         <Plus className="h-7 w-7" strokeWidth={2.5} />
@@ -227,9 +257,9 @@ export default function SalesLog() {
 
       {/* Sale Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditing(null); }}>
-        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto glass-strong glow-border-gold">
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto glass-strong glow-border-gold" style={{ background: "hsl(0 0% 9%)", color: "hsl(0 0% 93%)" }}>
           <DialogHeader>
-            <DialogTitle className="font-display">{editing ? "Edit Sale" : "New Sale"}</DialogTitle>
+            <DialogTitle className="font-display" style={{ color: "hsl(0 0% 95%)" }}>{editing ? "Edit Sale" : "New Sale"}</DialogTitle>
           </DialogHeader>
           <SaleForm
             customers={customers}
