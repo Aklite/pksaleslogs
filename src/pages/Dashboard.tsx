@@ -135,24 +135,24 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>Dashboard</h1>
-          <p className="text-xs" style={{ color: "hsl(0 0% 50%)" }}>Your sales at a glance</p>
+          <h1 className="text-2xl font-display font-bold text-foreground">Dashboard</h1>
+          <p className="text-xs text-muted-foreground">Your sales at a glance</p>
         </div>
         <LogoutButton />
       </div>
 
       {/* Today's Saree Counter */}
-      <div className="gradient-gold rounded-xl p-4 shadow-gold text-center">
-        <p className="text-xs font-semibold uppercase tracking-wider opacity-80" style={{ color: "hsl(0 0% 7%)" }}>Today</p>
-        <p className="text-4xl font-display font-bold" style={{ color: "hsl(0 0% 7%)" }}>{todaySareeCount}</p>
-        <p className="text-sm font-semibold opacity-80" style={{ color: "hsl(0 0% 7%)" }}>
+      <div className="gradient-royal rounded-xl p-4 shadow-royal text-center">
+        <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: "hsl(43 74% 52%)" }}>Today</p>
+        <p className="text-4xl font-display font-bold" style={{ color: "hsl(57 100% 91%)" }}>{todaySareeCount}</p>
+        <p className="text-sm font-semibold" style={{ color: "hsl(220 40% 70%)" }}>
           {todaySareeCount === 1 ? "Saree" : "Sarees"} Sold
         </p>
       </div>
 
       {/* Bento Cards */}
       <div className="grid grid-cols-2 gap-3">
-        <BentoCard title="Today" value={formatCurrency(todaySales)} icon={<IndianRupee className="h-3.5 w-3.5" />} variant="emerald" />
+        <BentoCard title="Today" value={formatCurrency(todaySales)} icon={<IndianRupee className="h-3.5 w-3.5" />} variant="royal" />
         <BentoCard title="This Month" value={formatCurrency(monthlyTotal)} icon={<TrendingUp className="h-3.5 w-3.5" />} variant="gold" />
         <BentoCard title="Tips Earned" value={formatCurrency(tipsEarned)} icon={<Coins className="h-3.5 w-3.5" />} />
         <BentoCard title="Commission" value={formatCurrency(monthlyCommission)} icon={<Award className="h-3.5 w-3.5" />} />
@@ -160,19 +160,19 @@ export default function Dashboard() {
 
       {/* Today's Bills */}
       <div className="glass-strong rounded-xl p-4 glow-border-gold">
-        <h3 className="text-sm font-semibold mb-3" style={{ color: "hsl(0 0% 90%)" }}>Today's Bills</h3>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Today's Bills</h3>
         {todayBills.length === 0 ? (
-          <p className="text-xs text-center py-4" style={{ color: "hsl(0 0% 45%)" }}>No sales today yet</p>
+          <p className="text-xs text-center py-4 text-muted-foreground">No sales today yet</p>
         ) : (
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {todayBills.map((bill) => (
-              <div key={bill.id} className="flex items-center justify-between py-1.5" style={{ borderBottom: "1px solid hsl(0 0% 16%)" }}>
+              <div key={bill.id} className="flex items-center justify-between py-1.5" style={{ borderBottom: "1px solid hsl(220 30% 82% / 0.5)" }}>
                 <div className="min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: "hsl(0 0% 90%)" }}>{bill.customer_name}</p>
-                  <p className="text-[10px]" style={{ color: "hsl(0 0% 50%)" }}>{bill.quantity} saree{bill.quantity > 1 ? "s" : ""}</p>
+                  <p className="text-sm font-medium truncate text-foreground">{bill.customer_name}</p>
+                  <p className="text-[10px] text-muted-foreground">{bill.quantity} saree{bill.quantity > 1 ? "s" : ""}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <p className="text-sm font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>{formatCurrency(bill.total)}</p>
+                  <p className="text-sm font-display font-bold text-foreground">{formatCurrency(bill.total)}</p>
                   <button
                     onClick={() => handleDeleteTodaySale(bill.id)}
                     className="p-1 rounded hover:bg-destructive/10 transition-colors"
@@ -188,23 +188,23 @@ export default function Dashboard() {
 
       {/* Weekly Chart */}
       <div className="glass-strong rounded-xl p-4 glow-border-gold">
-        <h3 className="text-sm font-semibold mb-3" style={{ color: "hsl(0 0% 90%)" }}>Weekly Performance</h3>
+        <h3 className="text-sm font-semibold mb-3 text-foreground">Weekly Performance</h3>
         <ResponsiveContainer width="100%" height={180}>
           <BarChart data={weeklyData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 16%)" />
-            <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(0 0% 50%)" }} stroke="hsl(0 0% 20%)" />
-            <YAxis tick={{ fontSize: 11, fill: "hsl(0 0% 50%)" }} stroke="hsl(0 0% 20%)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(220 30% 82% / 0.5)" />
+            <XAxis dataKey="day" tick={{ fontSize: 11, fill: "hsl(220 20% 45%)" }} stroke="hsl(220 30% 82%)" />
+            <YAxis tick={{ fontSize: 11, fill: "hsl(220 20% 45%)" }} stroke="hsl(220 30% 82%)" />
             <Tooltip
               contentStyle={{
-                background: "hsl(0 0% 10%)",
-                border: "1px solid hsl(43 74% 49% / 0.2)",
+                background: "hsl(0 0% 100% / 0.95)",
+                border: "1px solid hsl(43 74% 52% / 0.25)",
                 borderRadius: 8,
                 fontSize: 12,
-                color: "hsl(0 0% 93%)",
+                color: "hsl(220 60% 15%)",
               }}
               formatter={(value: number) => [`₹${value.toLocaleString("en-IN")}`, "Sales"]}
             />
-            <Bar dataKey="sales" fill="hsl(43 74% 49%)" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="sales" fill="hsl(220 100% 20%)" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -212,9 +212,9 @@ export default function Dashboard() {
       {/* Progress Ring */}
       <div className="glass-strong rounded-xl p-4 glow-border-gold flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold" style={{ color: "hsl(0 0% 90%)" }}>Monthly Goal</h3>
-          <p className="text-xs" style={{ color: "hsl(0 0% 50%)" }}>₹10,00,000 target</p>
-          <p className="text-lg font-display font-bold mt-1" style={{ color: "hsl(0 0% 95%)" }}>{formatCurrency(monthlyTotal)}</p>
+          <h3 className="text-sm font-semibold text-foreground">Monthly Goal</h3>
+          <p className="text-xs text-muted-foreground">₹10,00,000 target</p>
+          <p className="text-lg font-display font-bold mt-1 text-foreground">{formatCurrency(monthlyTotal)}</p>
         </div>
         <ProgressRing progress={progress} label="Goal" size={100} />
       </div>
@@ -227,8 +227,7 @@ function LogoutButton() {
   return (
     <button
       onClick={signOut}
-      className="text-xs transition-colors px-3 py-1.5 rounded-md glass glow-border-gold"
-      style={{ color: "hsl(0 0% 55%)" }}
+      className="text-xs transition-colors px-3 py-1.5 rounded-md glass glow-border-gold text-muted-foreground"
     >
       Sign out
     </button>

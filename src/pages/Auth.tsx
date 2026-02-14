@@ -32,37 +32,37 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "hsl(0 0% 7%)" }}>
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "linear-gradient(180deg, hsl(220 100% 20%), hsl(220 80% 28%))" }}>
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>
-            Sales<span style={{ color: "hsl(43 74% 49%)" }}>Logs</span>
+          <h1 className="text-3xl font-display font-bold" style={{ color: "hsl(57 100% 91%)" }}>
+            Sales<span style={{ color: "hsl(43 74% 52%)" }}>Logs</span>
           </h1>
-          <p className="text-sm mt-1" style={{ color: "hsl(0 0% 55%)" }}>Your Premium Sales Companion</p>
+          <p className="text-sm mt-1" style={{ color: "hsl(220 40% 70%)" }}>Your Premium Sales Companion</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 glass-strong rounded-2xl p-6 glow-border-gold">
+        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl p-6" style={{ background: "hsl(0 0% 100% / 0.1)", backdropFilter: "blur(24px)", border: "1px solid hsl(43 74% 52% / 0.2)" }}>
           <Input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="h-12 bg-transparent border-0 glass glow-border-gold"
-            style={{ color: "hsl(0 0% 93%)" }}
+            className="h-12 border-0"
+            style={{ background: "hsl(0 0% 100% / 0.12)", color: "hsl(57 100% 91%)" }}
           />
           <Input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="h-12 bg-transparent border-0 glass glow-border-gold"
-            style={{ color: "hsl(0 0% 93%)" }}
+            className="h-12 border-0"
+            style={{ background: "hsl(0 0% 100% / 0.12)", color: "hsl(57 100% 91%)" }}
           />
           <Button
             type="submit"
             disabled={loading}
             className="w-full h-12 gradient-gold font-semibold text-base border-0 hover:opacity-90"
-            style={{ color: "hsl(0 0% 7%)" }}
+            style={{ color: "hsl(220 100% 10%)" }}
           >
             {loading ? "Please wait..." : isLogin ? "Sign In" : "Create Account"}
           </Button>
@@ -71,7 +71,7 @@ export default function Auth() {
         <button
           onClick={() => setIsLogin(!isLogin)}
           className="w-full text-center text-sm mt-4 transition-colors"
-          style={{ color: "hsl(0 0% 55%)" }}
+          style={{ color: "hsl(220 40% 70%)" }}
         >
           {isLogin ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
         </button>

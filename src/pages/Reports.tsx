@@ -133,23 +133,22 @@ export default function Reports() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>Reports</h1>
+      <h1 className="text-2xl font-display font-bold text-foreground">Reports</h1>
 
-      {/* Monthly Ledger Export */}
       <div className="glass-strong rounded-xl p-6 glow-border-gold space-y-5">
         <div className="flex items-center gap-3">
-          <FileSpreadsheet className="h-8 w-8" style={{ color: "hsl(43 74% 49%)" }} />
+          <FileSpreadsheet className="h-8 w-8" style={{ color: "hsl(43 74% 52%)" }} />
           <div>
-            <h3 className="font-semibold" style={{ color: "hsl(0 0% 90%)" }}>Monthly Ledger Export</h3>
-            <p className="text-xs" style={{ color: "hsl(0 0% 50%)" }}>Download your sales data as Excel</p>
+            <h3 className="font-semibold text-foreground">Monthly Ledger Export</h3>
+            <p className="text-xs text-muted-foreground">Download your sales data as Excel</p>
           </div>
         </div>
 
         <Select value={month} onValueChange={setMonth}>
-          <SelectTrigger className="h-11 glass glow-border-gold bg-transparent" style={{ color: "hsl(0 0% 93%)" }}>
+          <SelectTrigger className="h-11 glass glow-border-gold bg-transparent text-foreground">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent style={{ background: "hsl(0 0% 10%)", border: "1px solid hsl(43 74% 49% / 0.15)", color: "hsl(0 0% 93%)" }}>
+          <SelectContent className="bg-background border-border text-foreground">
             {months.map((m) => (
               <SelectItem key={m.value} value={m.value}>{m.label}</SelectItem>
             ))}
@@ -160,20 +159,19 @@ export default function Reports() {
           onClick={exportToExcel}
           disabled={loading}
           className="w-full h-12 gradient-gold border-0 font-semibold text-base gap-2"
-          style={{ color: "hsl(0 0% 7%)" }}
+          style={{ color: "hsl(220 100% 10%)" }}
         >
           <Download className="h-5 w-5" />
           {loading ? "Generating..." : "Export Monthly Ledger"}
         </Button>
       </div>
 
-      {/* Customer Directory Export */}
       <div className="glass-strong rounded-xl p-6 glow-border-gold space-y-5">
         <div className="flex items-center gap-3">
-          <Users className="h-8 w-8" style={{ color: "hsl(43 74% 49%)" }} />
+          <Users className="h-8 w-8" style={{ color: "hsl(43 74% 52%)" }} />
           <div>
-            <h3 className="font-semibold" style={{ color: "hsl(0 0% 90%)" }}>Customer Directory Export</h3>
-            <p className="text-xs" style={{ color: "hsl(0 0% 50%)" }}>Name, Phone, City, Temperament, Preferences & Total Purchases</p>
+            <h3 className="font-semibold text-foreground">Customer Directory Export</h3>
+            <p className="text-xs text-muted-foreground">Name, Phone, City, Temperament, Preferences & Total Purchases</p>
           </div>
         </div>
 
@@ -181,7 +179,7 @@ export default function Reports() {
           onClick={exportCustomerDirectory}
           disabled={loadingDir}
           className="w-full h-12 gradient-gold border-0 font-semibold text-base gap-2"
-          style={{ color: "hsl(0 0% 7%)" }}
+          style={{ color: "hsl(220 100% 10%)" }}
         >
           <Download className="h-5 w-5" />
           {loadingDir ? "Generating..." : "Export Customer Directory"}
