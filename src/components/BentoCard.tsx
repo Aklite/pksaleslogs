@@ -4,24 +4,24 @@ interface BentoCardProps {
   title: string;
   value: string;
   icon: ReactNode;
-  variant?: "emerald" | "gold" | "default";
+  variant?: "emerald" | "gold" | "royal" | "default";
 }
 
 export default function BentoCard({ title, value, icon, variant = "default" }: BentoCardProps) {
-  const isEmerald = variant === "emerald";
+  const isRoyal = variant === "royal";
   const isGold = variant === "gold";
 
   return (
     <div
       className={`rounded-xl p-4 ${
-        isEmerald
-          ? "gradient-emerald"
+        isRoyal
+          ? "gradient-royal shadow-royal"
           : isGold
-          ? "gradient-gold"
+          ? "gradient-gold shadow-gold"
           : "glass-strong glow-border-gold"
       }`}
       style={{
-        color: isEmerald || isGold ? "hsl(0 0% 7%)" : "hsl(0 0% 93%)",
+        color: isRoyal ? "hsl(57 100% 91%)" : isGold ? "hsl(220 100% 10%)" : "hsl(220 60% 15%)",
       }}
     >
       <div className="flex items-center gap-2 mb-1 opacity-80 text-xs font-medium uppercase tracking-wider">

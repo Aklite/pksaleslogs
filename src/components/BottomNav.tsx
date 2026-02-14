@@ -11,12 +11,12 @@ const navItems = [
 export default function BottomNav() {
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-50"
+      className="fixed bottom-0 left-0 right-0 z-50 glass"
       style={{
-        background: "hsl(0 0% 7% / 0.95)",
+        background: "hsl(0 0% 100% / 0.92)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        borderTop: "1px solid hsl(43 74% 49% / 0.1)",
+        borderTop: "1px solid hsl(43 74% 52% / 0.15)",
       }}
     >
       <div className="flex items-center justify-around h-16 max-w-lg mx-auto">
@@ -31,7 +31,7 @@ export default function BottomNav() {
               }`
             }
             style={({ isActive }) => ({
-              color: isActive ? "hsl(43 74% 49%)" : "hsl(0 0% 45%)",
+              color: isActive ? "hsl(220 100% 20%)" : "hsl(220 20% 55%)",
             })}
           >
             <item.icon className="h-5 w-5" />

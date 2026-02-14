@@ -93,9 +93,7 @@ export default function SalesLog() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [user]);
+  useEffect(() => { fetchData(); }, [user]);
 
   const openEdit = (s: Sale) => {
     setEditing(s);
@@ -172,16 +170,16 @@ export default function SalesLog() {
 
   const paymentBadgeStyle = (mode: string) => {
     switch (mode) {
-      case "upi": return { background: "hsl(260 60% 50% / 0.12)", color: "hsl(260 50% 65%)" };
-      case "card": return { background: "hsl(210 60% 50% / 0.12)", color: "hsl(210 50% 65%)" };
-      default: return { background: "hsl(142 40% 40% / 0.12)", color: "hsl(142 50% 55%)" };
+      case "upi": return { background: "hsl(260 60% 50% / 0.1)", color: "hsl(260 50% 40%)" };
+      case "card": return { background: "hsl(210 60% 50% / 0.1)", color: "hsl(210 50% 40%)" };
+      default: return { background: "hsl(142 40% 40% / 0.1)", color: "hsl(142 50% 35%)" };
     }
   };
 
   return (
     <div className="space-y-4 pb-20">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>Sales Log</h1>
+        <h1 className="text-2xl font-display font-bold text-foreground">Sales Log</h1>
       </div>
 
       {loading ? (
@@ -200,11 +198,11 @@ export default function SalesLog() {
             >
               <div className="flex items-center justify-between">
                 <div className="min-w-0">
-                  <p className="font-semibold text-sm truncate" style={{ color: "hsl(0 0% 90%)" }}>{s.customer_name}</p>
-                  <p className="text-xs" style={{ color: "hsl(0 0% 50%)" }}>{format(new Date(s.sale_date), "dd MMM yyyy")}</p>
+                  <p className="font-semibold text-sm truncate text-foreground">{s.customer_name}</p>
+                  <p className="text-xs text-muted-foreground">{format(new Date(s.sale_date), "dd MMM yyyy")}</p>
                   <div className="flex items-center gap-1.5 mt-1">
                     {s.saree_type && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold gradient-gold" style={{ color: "hsl(0 0% 7%)" }}>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold gradient-gold" style={{ color: "hsl(220 100% 10%)" }}>
                         {s.saree_type}
                       </span>
                     )}
@@ -214,12 +212,12 @@ export default function SalesLog() {
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="font-display font-bold" style={{ color: "hsl(0 0% 95%)" }}>₹{Number(s.total).toLocaleString("en-IN")}</p>
-                  <p className="text-[10px]" style={{ color: "hsl(0 0% 50%)" }}>
+                  <p className="font-display font-bold text-foreground">₹{Number(s.total).toLocaleString("en-IN")}</p>
+                  <p className="text-[10px] text-muted-foreground">
                     {s.quantity}x ₹{Number(s.saree_price).toLocaleString("en-IN")}
                   </p>
                   {s.commission > 0 && (
-                    <p className="text-[10px] font-medium" style={{ color: "hsl(43 74% 38%)" }}>
+                    <p className="text-[10px] font-medium" style={{ color: "hsl(220 60% 35%)" }}>
                       Commission: ₹{Number(s.commission).toLocaleString("en-IN")}
                     </p>
                   )}
@@ -227,7 +225,7 @@ export default function SalesLog() {
               </div>
               <div className="flex justify-end gap-1 mt-2">
                 <button onClick={() => openEdit(s)} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
-                  <Pencil className="h-3.5 w-3.5" style={{ color: "hsl(0 0% 50%)" }} />
+                  <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
                 </button>
                 <button onClick={() => handleDelete(s.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors">
                   <Trash2 className="h-3.5 w-3.5 text-destructive" />
@@ -239,27 +237,23 @@ export default function SalesLog() {
       )}
 
       {!loading && sales.length === 0 && (
-        <p className="text-center text-sm py-12" style={{ color: "hsl(0 0% 45%)" }}>No sales recorded yet. Tap the + button to begin.</p>
+        <p className="text-center text-sm py-12 text-muted-foreground">No sales recorded yet. Tap the + button to begin.</p>
       )}
 
       {/* Floating Action Button */}
       <button
-        onClick={() => {
-          setEditing(null);
-          setDialogOpen(true);
-        }}
+        onClick={() => { setEditing(null); setDialogOpen(true); }}
         className="fixed bottom-24 right-5 z-40 h-14 w-14 rounded-full gradient-gold shadow-gold flex items-center justify-center active:scale-95 transition-transform"
-        style={{ color: "hsl(0 0% 7%)" }}
+        style={{ color: "hsl(220 100% 10%)" }}
         aria-label="New Sale"
       >
         <Plus className="h-7 w-7" strokeWidth={2.5} />
       </button>
 
-      {/* Sale Form Dialog */}
       <Dialog open={dialogOpen} onOpenChange={(v) => { setDialogOpen(v); if (!v) setEditing(null); }}>
-        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto glass-strong glow-border-gold" style={{ background: "hsl(0 0% 9%)", color: "hsl(0 0% 93%)" }}>
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto glass-strong glow-border-gold bg-background text-foreground">
           <DialogHeader>
-            <DialogTitle className="font-display" style={{ color: "hsl(0 0% 95%)" }}>{editing ? "Edit Sale" : "New Sale"}</DialogTitle>
+            <DialogTitle className="font-display text-foreground">{editing ? "Edit Sale" : "New Sale"}</DialogTitle>
           </DialogHeader>
           <SaleForm
             customers={customers}
@@ -270,14 +264,10 @@ export default function SalesLog() {
         </DialogContent>
       </Dialog>
 
-      {/* WhatsApp Thank You */}
       {whatsApp && (
         <WhatsAppThankYou
           open={!!whatsApp}
-          onClose={() => {
-            setWhatsApp(null);
-            toast.success("Sale recorded! 🎉");
-          }}
+          onClose={() => { setWhatsApp(null); toast.success("Sale recorded! 🎉"); }}
           customerName={whatsApp.name}
           customerPhone={whatsApp.phone}
         />

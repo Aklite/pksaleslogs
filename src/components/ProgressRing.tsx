@@ -1,5 +1,5 @@
 interface ProgressRingProps {
-  progress: number; // 0-100
+  progress: number;
   size?: number;
   strokeWidth?: number;
   label: string;
@@ -36,7 +36,7 @@ export default function ProgressRing({ progress, size = 120, strokeWidth = 10, l
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-lg font-display font-bold">{Math.round(progress)}%</span>
+          <span className="text-lg font-display font-bold text-foreground">{Math.round(progress)}%</span>
         </div>
       </div>
       <span className="text-xs text-muted-foreground font-medium">{label}</span>
