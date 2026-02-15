@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Plus, Search, MessageCircle, Pencil, Trash2, Star, Filter, ChevronDown, ChevronUp, Upload, X } from "lucide-react";
+import { Plus, Search, MessageCircle, Pencil, Trash2, Star, Filter, ChevronDown, ChevronUp, Upload, X, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AnimatePresence, motion } from "framer-motion";
+import OCRCameraOverlay from "@/components/OCRCameraOverlay";
 
 const PREFERENCE_TAGS = ["Likes Silk", "Heavy Work", "Simple/Daily Wear", "Banarasi Fan", "Designer Only", "Budget Conscious"];
 const BUYER_SPEEDS = ["Fast Buyer", "Frequent Buyer", "Window Shopper"];
@@ -65,6 +66,7 @@ export default function Customers() {
   const [filterFast, setFilterFast] = useState(false);
   const [photos, setPhotos] = useState<Record<string, CustomerPhoto[]>>({});
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [ocrOpen, setOcrOpen] = useState(false);
 
   const fetchCustomers = async () => {
     if (!user) return;
@@ -458,7 +460,31 @@ export default function Customers() {
           <div className="space-y-3 mt-4">
             <Input placeholder="Name *" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="h-11 glass glow-border-gold bg-transparent text-foreground" />
             <Input placeholder="Phone *" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="h-11 glass glow-border-gold bg-transparent text-foreground" />
-            <Input placeholder="Address / City" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="h-11 glass glow-border-gold bg-transparent text-foreground" />
+            <div className="relative">
+              <Input placeholder="Address / City" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} className="h-11 pr-12 glass glow-border-gold bg-transparent text-foreground" />
+              <button
+                type="button"
+                onClick={() => setOcrOpen(true)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg transition-colors hover:bg-muted"
+                title="Scan address with camera"
+              >
+                <Camera className="h-5 w-5" style={{ color: "hsl(43 74% 52%)" }} />
+              </button>
+            </div>
+            <OCRCameraOverlay
+              open={ocrOpen}
+              onClose={() => setOcrOpen(false)}
+              onResult={(text, detectedCity) => {
+                setForm((f) => ({
+                  ...f,
+                  address: text,
+                  ...(detectedCity ? {} : {}),
+                }));
+                if (detectedCity) {
+                  toast.success(`Detected city: ${detectedCity}`);
+                }
+              }}
+            />
             <Textarea placeholder="Style Notes" value={form.style_notes} onChange={(e) => setForm({ ...form, style_notes: e.target.value })} rows={2} className="glass glow-border-gold bg-transparent text-foreground" />
 
             <div>
